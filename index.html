@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartas de Casa Lucas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,500&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* VOICE everyday family game, playful but tidy
+   IDEA a deck of house playing cards dealt on the Casa Lucas table, same night-forest look as the menu
+   PICTURE the deck itself: word side up, flip to see a drawn ingredient and its Spanish name
+   COLOUR forest-night ground, pumpkin orange card backs, one colour per language
+   TYPE Fraunces display + DM Sans text
+   LAYOUT modest title and score on one row, filters, then the grid; 2 columns on a phone, 4 to 6 on a laptop */
+:root{color-scheme:dark;--bg:#14211A;--panel:#1C2D24;--line:#2E4337;--ink:#F3ECDF;--muted:#B8C2B3;--accent:#EE8A3C;--soft:#F6B47F;--deep:#14211A;--hv:#F09A8C;--el:#9ED3A1;--no:#A9C2E6;--is:#EBC060}
+:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'DM Sans',system-ui,sans-serif;overflow-x:clip}
+.wrap{max-width:1240px;margin:0 auto;padding:clamp(24px,4vw,56px) max(4vw,16px) 48px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 32px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand svg{flex:none;width:52px;height:52px}
+h1{margin:0;font:800 clamp(32px,5vw,48px)/1.05 'Fraunces',Georgia,serif;letter-spacing:-.02em;text-wrap:balance}
+.sub{margin:6px 0 0;color:var(--muted);font:italic 500 19px/1.3 'Fraunces',Georgia,serif}
+.lead{margin:16px 0 0;max-width:62ch;color:#D9D3C7}
+.score{min-width:220px;flex:0 1 300px}
+.score p{margin:0 0 8px;font-weight:700;white-space:nowrap}
+.score b{color:var(--accent);font-size:22px}
+.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.win{margin:8px 0 0;color:var(--soft);font-weight:700;min-height:1.5em}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:28px 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+.chip,.act{min-height:44px;padding:8px 16px;border-radius:99px;border:2px solid var(--line);background:transparent;font-weight:500;font-size:15px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--deep);border-color:var(--ink)}
+.chip i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.act{border-color:var(--accent);color:var(--accent);font-weight:700}
+.act:hover,.chip:hover{border-color:var(--muted)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,44vw),1fr));gap:18px}
+.slot{display:flex;flex-direction:column;gap:8px}
+.card{position:relative;display:block;width:100%;aspect-ratio:3/4;padding:0;border:0;background:none;perspective:900px;text-align:left}
+.inner{position:absolute;inset:0;transition:transform .55s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+.card[aria-pressed=true] .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:18px;padding:14px;display:flex;flex-direction:column;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.front{background:var(--panel);border:2px solid var(--line)}
+.card:hover .front{border-color:#3F5A4A}
+.tag{align-self:flex-start;padding:3px 10px;border:2px solid currentColor;border-radius:99px;font-size:13px;font-weight:700;line-height:1.3}
+.word{margin:auto 0;font:600 26px/1.1 'Fraunces',Georgia,serif;overflow-wrap:anywhere}
+.word.long{font-size:21px}
+.hint{color:var(--muted);font-size:13px}
+.back{transform:rotateY(180deg);background:var(--accent);color:var(--deep);align-items:center;text-align:center;gap:4px}
+.back svg{width:min(62%,110px);height:auto;flex:1 1 auto;fill:none;stroke:var(--deep);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.back svg .f{fill:var(--soft)}
+.es{font:800 19px/1.15 'Fraunces',Georgia,serif}
+.note{font-size:13px;line-height:1.35}
+.hit{min-height:44px;border-radius:12px;border:2px solid var(--line);background:transparent;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+.hit svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
+.hit[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--deep)}
+.hit[aria-pressed=true] svg{opacity:1}
+.foot{margin-top:36px;padding-top:20px;border-top:2px solid var(--line);color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;gap:8px 24px}
+@media (prefers-reduced-motion:reduce){.inner,.meter span{transition:none}}
+@media (max-width:600px){.score{flex:1 1 100%}.word{font-size:23px}.word.long{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="brand">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#EE8A3C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M32 19c-1-5 1-9 6-11"/><path d="M32 20c-13 0-23 7-23 19s10 18 23 18 23-6 23-18-10-19-23-19z"/><path d="M32 20c-6 0-10 8-10 18s4 19 10 19 10-9 10-19-4-18-10-18z"/></svg>
+        <div>
+          <h1>Cartas de Casa Lucas</h1>
+          <p class="sub">Antigua Casa Paco · menú del 16 de noviembre</p>
+        </div>
+      </div>
+      <p class="lead">Lee la palabra, di qué ingrediente es y toca la carta para comprobarlo. Si aciertas, márcala. Los principales están en alto valyrio, élfico y nórdico antiguo; los demás, en islandés.</p>
+    </div>
+    <div class="score" aria-live="polite">
+      <p>Acertadas <b id="hits">0</b> de <span id="total">12</span></p>
+      <div class="meter"><span id="meter"></span></div>
+      <p class="win" id="win"></p>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="chips" id="chips" role="group" aria-label="Filtrar por idioma"></div>
+    <button class="act" id="shuffle" type="button">Barajar</button>
+    <button class="act" id="reset" type="button">Volver a empezar</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <footer class="foot">
+    <span>Alto valyrio: <i>drōmon</i> «huevo», <i>nollon</i> «seta». Lo creó David J. Peterson para Juego de Tronos.</span>
+    <span>Élfico: <i>lingwë</i> es «pez»; <i>culvelyávë</i> la crearon fans de Tolkien en 2021.</span>
+    <span>Nórdico antiguo: <i>viðsmjǫr</i> es aceite; los vikingos no conocían la mayonesa.</span>
+  </footer>
+</div>
+
+<script>
+{
+const LANGS = {
+  hv: {n: 'Alto valyrio', c: 'var(--hv)'},
+  el: {n: 'Élfico · quenya', c: 'var(--el)'},
+  no: {n: 'Nórdico antiguo', c: 'var(--no)'},
+  is: {n: 'Islandés', c: 'var(--is)'}
+};
+
+const CARDS = [
+  {id: 'droma', w: 'drōma', lang: 'hv', es: 'Huevos', note: 'Plural de drōmon, «huevo».', isl: 'egg', icon: 'egg'},
+  {id: 'lingwe', w: 'lingwë', lang: 'el', es: 'Atún', note: 'Literalmente «pez».', isl: 'túnfiskur', icon: 'fish'},
+  {id: 'vidsmjor', w: 'viðsmjǫr', lang: 'no', es: 'Mayonesa', note: 'Literalmente «mantequilla de árbol»: aceite.', isl: 'majónes', icon: 'jar'},
+  {id: 'laukr', w: 'laukr', lang: 'no', es: 'Puerro', note: '«Recto como un puerro», decían.', isl: 'blaðlaukur', icon: 'leek'},
+  {id: 'culvelyave', w: 'culvelyávë', lang: 'el', es: 'Calabaza', note: 'Inventada por fans: «calabaza rojidorada».', isl: 'grasker', icon: 'pumpkin'},
+  {id: 'nollon', w: 'nollon', lang: 'hv', es: 'Setas', note: 'Palabra de Juego de Tronos.', isl: 'sveppir', icon: 'mushroom'},
+  {id: 'fennikka', w: 'fennikka', lang: 'is', es: 'Hinojo', note: 'Va en la sopa, con el puerro.', icon: 'fennel'},
+  {id: 'hvitlaukur', w: 'hvítlaukur', lang: 'is', es: 'Ajo', note: 'Literalmente «laukr blanco».', icon: 'garlic'},
+  {id: 'rjomi', w: 'sýrður rjómi', lang: 'is', es: 'Crème fraîche', note: 'Literalmente «nata agria».', icon: 'tub'},
+  {id: 'kartoflur', w: 'stökkar kartöflur', lang: 'is', es: 'Patatas paja', note: 'Stökkur significa «crujiente».', icon: 'fries'},
+  {id: 'paprika', w: 'paprikuduft', lang: 'is', es: 'Pimentón', note: 'Literalmente «polvo de pimiento».', icon: 'pepper'},
+  {id: 'mais', w: 'maísrúlla', lang: 'is', es: 'Nacho roll', note: 'Literalmente «rollo de maíz».', icon: 'roll'}
+];
+
+const ICONS = {
+  egg: '<path class="f" d="M50 12C34 12 22 40 22 58c0 17 12 30 28 30s28-13 28-30C78 40 66 12 50 12z"/><path d="M36 52c0-10 4-20 9-26"/>',
+  fish: '<path class="f" d="M10 50c12-18 38-24 58-14l16-14v56L68 64C48 74 22 68 10 50z"/><circle cx="26" cy="46" r="3"/><path d="M40 38c4 8 4 16 0 24M52 31l6-10M52 69l6 10"/>',
+  jar: '<rect class="f" x="24" y="34" width="52" height="54" rx="10"/><rect x="28" y="20" width="44" height="14" rx="4"/><path d="M34 54h32M34 66h22"/>',
+  leek: '<rect class="f" x="42" y="44" width="16" height="44" rx="8"/><path d="M46 46C42 30 32 18 20 10M54 46C58 30 68 18 80 10M50 44V6M44 88l-5 7M50 89v8M56 88l5 7"/>',
+  pumpkin: '<path class="f" d="M50 28c-18 0-32 10-32 28s14 30 32 30 32-12 32-30-14-28-32-28z"/><path d="M50 28c-8 0-13 12-13 28s5 30 13 30 13-14 13-30-5-28-13-28z"/><path d="M50 28c-1-8 2-14 9-17"/>',
+  mushroom: '<path class="f" d="M12 54c0-22 17-38 38-38s38 16 38 38z"/><path d="M38 54v24c0 6 5 10 12 10s12-4 12-10V54"/><circle cx="34" cy="38" r="4"/><circle cx="60" cy="32" r="5"/><circle cx="71" cy="46" r="3"/>',
+  fennel: '<path class="f" d="M28 88c-10-8-10-26 0-36 6-6 14-8 22-8s16 2 22 8c10 10 10 28 0 36z"/><path d="M42 46L34 14M50 44V8M58 46l8-32M28 18l8-4M44 12l6-4 6 4M62 18l8-4"/>',
+  garlic: '<path class="f" d="M50 14c4 12 28 22 28 46 0 16-12 28-28 28S22 76 22 60c0-24 24-34 28-46z"/><path d="M50 34v54M38 44c-6 14-4 32 6 44M62 44c6 14 4 32-6 44"/>',
+  tub: '<path class="f" d="M22 42h56l-7 44H29z"/><path d="M18 42h64"/><path d="M36 42c-2-10 6-16 14-12 6-6 18-2 14 12"/>',
+  fries: '<path d="M26 56l8-36M38 56l3-40M50 56V14M62 56l-3-40M74 56l-8-36"/><path class="f" d="M14 56h72c0 18-16 30-36 30S14 74 14 56z"/>',
+  pepper: '<path class="f" d="M28 24c10 0 14 8 16 14 4 14 16 28 34 36 5 2 3 10-2 10-28 0-50-20-52-46-1-10 0-14 4-14z"/><path d="M28 24c0-6 4-11 11-12"/>',
+  roll: '<path class="f" d="M22 68L64 26a11 11 0 0 1 16 16L38 84a11 11 0 0 1-16-16z"/><ellipse cx="72" cy="34" rx="6" ry="9" transform="rotate(45 72 34)"/><path d="M40 62l2 2M52 52l2 2M34 74l2 2M58 44l2 2"/>'
+};
+
+const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>';
+
+const fresh = () => ({flipped: {}, hits: {}, filter: 'all', order: CARDS.map(c => c.id)});
+let state = fresh();
+
+const grid = document.getElementById('grid');
+const chips = document.getElementById('chips');
+const hitsEl = document.getElementById('hits');
+const meter = document.getElementById('meter');
+const win = document.getElementById('win');
+document.getElementById('total').textContent = CARDS.length;
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+function cardHtml(c) {
+  const L = LANGS[c.lang];
+  const flipped = !!state.flipped[c.id];
+  const hit = !!state.hits[c.id];
+  const extra = c.isl ? 'En islandés: ' + c.isl : c.note;
+  const sub = c.isl ? c.note : '';
+  return '<div class="slot">' +
+    '<button class="card" type="button" data-id="' + c.id + '" aria-pressed="' + flipped + '" aria-label="' + esc(c.w) + ', ' + L.n + '. Toca para girar">' +
+      '<span class="inner">' +
+        '<span class="face front">' +
+          '<span class="tag" style="color:' + L.c + '">' + L.n + '</span>' +
+          '<span class="word' + (c.w.length > 10 ? ' long' : '') + '">' + esc(c.w) + '</span>' +
+          '<span class="hint">Toca para girar</span>' +
+        '</span>' +
+        '<span class="face back">' +
+          '<svg viewBox="0 0 100 100" aria-hidden="true">' + ICONS[c.icon] + '</svg>' +
+          '<span class="es">' + esc(c.es) + '</span>' +
+          '<span class="note">' + esc(extra) + '</span>' +
+          (sub ? '<span class="note">' + esc(sub) + '</span>' : '') +
+        '</span>' +
+      '</span>' +
+    '</button>' +
+    '<button class="hit" type="button" data-hit="' + c.id + '" aria-pressed="' + hit + '">' + CHECK + 'Acerté</button>' +
+  '</div>';
+}
+
+function renderChips() {
+  const opts = [['all', 'Todas', '']].concat(Object.keys(LANGS).map(k => [k, LANGS[k].n, LANGS[k].c]));
+  chips.innerHTML = opts.map(o =>
+    '<button class="chip" type="button" data-f="' + o[0] + '" aria-pressed="' + (state.filter === o[0]) + '">' +
+    (o[2] ? '<i style="background:' + o[2] + '"></i>' : '') + o[1] + '</button>'
+  ).join('');
+}
+
+function renderScore() {
+  const n = CARDS.filter(c => state.hits[c.id]).length;
+  hitsEl.textContent = n;
+  meter.style.width = (n / CARDS.length * 100) + '%';
+  win.textContent = n === CARDS.length ? 'Políglota oficial de Casa Lucas.' : '';
+}
+
+function render() {
+  const list = state.order
+    .map(id => CARDS.find(c => c.id === id))
+    .filter(c => state.filter === 'all' || c.lang === state.filter);
+  grid.innerHTML = list.map(cardHtml).join('');
+  renderChips();
+  renderScore();
+}
+
+grid.addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if (card) {
+    const id = card.dataset.id;
+    state.flipped[id] = !state.flipped[id];
+    card.setAttribute('aria-pressed', state.flipped[id]);
+    return;
+  }
+  const hit = e.target.closest('.hit');
+  if (hit) {
+    const id = hit.dataset.hit;
+    state.hits[id] = !state.hits[id];
+    hit.setAttribute('aria-pressed', state.hits[id]);
+    renderScore();
+  }
+});
+
+chips.addEventListener('click', e => {
+  const b = e.target.closest('.chip');
+  if (!b) return;
+  state.filter = b.dataset.f;
+  render();
+});
+
+document.getElementById('shuffle').addEventListener('click', () => {
+  const a = state.order.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  state.order = a;
+  state.flipped = {};
+  render();
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  state = fresh();
+  render();
+});
+
+function start(saved) {
+  const ok = saved && Array.isArray(saved.order) && saved.order.length === CARDS.length && saved.order.every(id => CARDS.some(c => c.id === id));
+  if (ok) state = Object.assign(fresh(), saved);
+  if (state.filter !== 'all' && !LANGS[state.filter]) state.filter = 'all';
+  render();
+}
+
+window.claude?.hot?.snapshot?.(() => state);
+if (window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data ?? {});
+}
+</script>
+</body>
+</html>
